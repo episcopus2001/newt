@@ -260,7 +260,7 @@ public class NewtTests extends NewtTestSupport {
     }
 
     @Test
-    @DisplayName("Test list predicates")
+    @DisplayName("9.1 List predicates")
     public void testListPredicates() {
         eval("(null? nil)").yieldsTrue();
         eval("(null? 4711)").yieldsFalse();
@@ -282,7 +282,7 @@ public class NewtTests extends NewtTestSupport {
     }
 
     @Test
-    @DisplayName("Test list constructors")
+    @DisplayName("9.2 List constructors")
     public void testListConstructors() {
         eval("(cons 1 2)").yields("(1.2)");
         eval("(cons 'a 'nil)").yields("(A)");
@@ -310,7 +310,7 @@ public class NewtTests extends NewtTestSupport {
     }
 
     @Test
-    @DisplayName("Test list access")
+    @DisplayName("9.3 List access")
     public void testListAccess() {
         eval("(car nil)").yieldsError();
         eval("(car '(a))").yields("A");
@@ -341,7 +341,7 @@ public class NewtTests extends NewtTestSupport {
     }
 
     @Test
-    @DisplayName("Test lists as sequences")
+    @DisplayName("9.4 Lists as sequences")
     public void testListsAsSequences() {
         eval("(length nil)").yields(0);
         eval("(length '(a))").yields(1);
@@ -381,8 +381,8 @@ public class NewtTests extends NewtTestSupport {
                 .eval("(push l '(a b c))")
                 .eval("l")
                 .yields("((A B C) 21 34 55)");
-                // .eval("(push (car l) 'd)")
-                // .yields("((D A B C) 21 34 55)");
+        // .eval("(push (car l) 'd)")
+        // .yields("((D A B C) 21 34 55)");
 
         lisp()
                 .eval("(define l '(21 34 55))")
@@ -391,6 +391,105 @@ public class NewtTests extends NewtTestSupport {
                 .eval("(pop l)")
                 .yields(21)
                 .eval("l").yields("(34 55)");
+
+    }
+
+    @Test
+    @DisplayName("12.1 Character and string predicates")
+    public void testCharacterAndStringPredicates() {
+
+        eval("(char? #\\X)").yieldsTrue();
+        eval("(char? 0)").yieldsFalse();
+
+        eval("(string? \"Tapir.\")").yieldsTrue();
+        eval("(string? 0)").yieldsFalse();
+
+//        eval("(graphic? #\\X)").yieldsTrue();
+//        eval("(graphic? #\\newline)").yieldsFalse();
+
+        eval("(whitespace? #\\X)").yieldsFalse();
+        eval("(whitespace? #\\newline)").yieldsTrue();
+
+        eval("(alphabetic? #\\y)").yieldsTrue();
+        eval("(alphabetic? #\\7)").yieldsFalse();
+
+        eval("(uppercase? #\\y)").yieldsFalse();
+        eval("(uppercase? #\\Y)").yieldsTrue();
+        eval("(uppercase? #\\comma)").yieldsFalse();
+
+        eval("(lowercase? #\\y)").yieldsTrue();
+        eval("(lowercase? #\\Y)").yieldsFalse();
+        eval("(lowercase? #\\comma)").yieldsFalse();
+
+        // TODO: Should be with a given radix
+        eval("(digit? #\\5)").yieldsTrue();
+        eval("(digit? #\\a)").yieldsFalse();
+    }
+
+    @Test
+    @DisplayName("12.2 Character and string comparisons")
+    public void testCharacterAndStringComparisons() {
+
+        eval("(char= #\\a #\\a)").yieldsTrue();
+        eval("(char= #\\a #\\b)").yieldsFalse();
+
+        eval("(char< #\\a #\\a)").yieldsFalse();
+        eval("(char< #\\a #\\b)").yieldsTrue();
+        eval("(char< #\\b #\\a)").yieldsFalse();
+        eval("(char< #\\A #\\A)").yieldsFalse();
+        eval("(char< #\\A #\\B)").yieldsTrue();
+        eval("(char< #\\B #\\A)").yieldsFalse();
+        eval("(char< #\\1 #\\1)").yieldsFalse();
+        eval("(char< #\\1 #\\2)").yieldsTrue();
+        eval("(char< #\\2 #\\1)").yieldsFalse();
+
+        eval("(char> #\\a #\\a)").yieldsFalse();
+        eval("(char> #\\a #\\b)").yieldsFalse();
+        eval("(char> #\\b #\\a)").yieldsTrue();
+        eval("(char> #\\A #\\A)").yieldsFalse();
+        eval("(char> #\\A #\\B)").yieldsFalse();
+        eval("(char> #\\B #\\A)").yieldsTrue();
+        eval("(char> #\\1 #\\1)").yieldsFalse();
+        eval("(char> #\\1 #\\2)").yieldsFalse();
+        eval("(char> #\\2 #\\1)").yieldsTrue();
+
+        eval("(char<= #\\a #\\a)").yieldsTrue();
+        eval("(char<= #\\a #\\b)").yieldsTrue();
+        eval("(char<= #\\b #\\a)").yieldsFalse();
+        eval("(char<= #\\A #\\A)").yieldsTrue();
+        eval("(char<= #\\A #\\B)").yieldsTrue();
+        eval("(char<= #\\B #\\A)").yieldsFalse();
+        eval("(char<= #\\1 #\\1)").yieldsTrue();
+        eval("(char<= #\\1 #\\2)").yieldsTrue();
+        eval("(char<= #\\2 #\\1)").yieldsFalse();
+
+        eval("(char>= #\\a #\\a)").yieldsTrue();
+        eval("(char>= #\\a #\\b)").yieldsFalse();
+        eval("(char>= #\\b #\\a)").yieldsTrue();
+        eval("(char>= #\\A #\\A)").yieldsTrue();
+        eval("(char>= #\\A #\\B)").yieldsFalse();
+        eval("(char>= #\\B #\\A)").yieldsTrue();
+        eval("(char>= #\\1 #\\1)").yieldsTrue();
+        eval("(char>= #\\1 #\\2)").yieldsFalse();
+        eval("(char>= #\\2 #\\1)").yieldsTrue();
+
+        // TODO: CHARN=
+
+        eval("(string-equal? \"hello\" \"hello\")").yieldsTrue();
+        eval("(string-equal? \"hello\" \"world\")").yieldsFalse();
+
+        // TODO: (make-string length)
+
+        eval("(string-append \"llama\" \" and \" \"alpaca\")").yields("\"llama and alpaca\"");
+
+        eval("(copy-string \"llama\")").yields("\"llama\"");
+
+        eval("(char->string #\\B)").yields("\"B\"");
+
+        eval("(list->string '(#\\Z #\\e #\\b #\\u))").yields("\"Zebu\"");
+
+        eval("(string->list \"Zebu\")").yields("(#\\Z #\\e #\\b #\\u)");
+
 
     }
 }

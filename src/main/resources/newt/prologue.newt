@@ -58,6 +58,20 @@
 (define (<= x y)
     (not (> x y)))
 
+; Character comparisons (given char<, char=)
+
+(define (char> x y)
+    (char< y x))
+
+(define (char!= x y)
+    (not (char= x y)))
+
+(define (char>= x y)
+    (not (char< x y)))
+
+(define (char<= x y)
+    (not (char> x y)))
+
 ; List access
 
 (define (nthcdr list index)

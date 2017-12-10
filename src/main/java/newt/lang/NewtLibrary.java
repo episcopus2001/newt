@@ -58,6 +58,9 @@ public class NewtLibrary {
         env = extend2(env, "=", NewtRuntime::eq);
         env = extend2(env, "<", NewtRuntime::lt);
 
+        env = extend2(env, "char=", NewtRuntime::charEq);
+        env = extend2(env, "char<", NewtRuntime::charLt);
+
         env = extend1(env, "number?", NewtRuntime::numberP);
         env = extend1(env, "string?", NewtRuntime::stringP);
         env = extend1(env, "symbol?", NewtRuntime::symbolP);
@@ -89,6 +92,12 @@ public class NewtLibrary {
         env = extend1(env, "list?", NewtRuntime::listP);
         env = extend1(env, "proper-list?", NewtRuntime::properListP);
         env = extend2(env, "eq?", NewtRuntime::eqP);
+        env = extend2(env, "string-equal?", NewtRuntime::stringEqualP);
+        env = extendv(env, "string-append", NewtRuntime::stringAppend);
+        env = extend1(env, "copy-string", NewtRuntime::copyString);
+        env = extend1(env, "char->string", NewtRuntime::charToString);
+        env = extend1(env, "list->string", NewtRuntime::listToString);
+        env = extend1(env, "string->list", NewtRuntime::stringToList);
 
         return env;
     }

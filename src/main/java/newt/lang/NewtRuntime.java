@@ -20,13 +20,18 @@ public class NewtRuntime {
     public static final NewtObject CHAR_SEMICOLON = makeCharacter(';');
     public static final NewtObject CHAR_TAB = makeCharacter('\t');
     public static final NewtObject CHAR_NEWLINE = makeCharacter('\n');
-    public static final NewtObject CHAR_CARRIAGE_RETURN = makeCharacter('\r');
+    public static final NewtObject CHAR_FORMFEED = makeCharacter('\r');
     public static final NewtObject CHAR_DOT = makeCharacter('.');
     public static final NewtObject CHAR_LEFT_PAREN = makeCharacter('(');
     public static final NewtObject CHAR_RIGHT_PAREN = makeCharacter(')');
+    public static final NewtObject CHAR_LEFT_BRACKET = makeCharacter('[');
+    public static final NewtObject CHAR_RIGHT_BRACKET = makeCharacter(']');
+    public static final NewtObject CHAR_LEFT_BRACE = makeCharacter('{');
+    public static final NewtObject CHAR_RIGHT_BRACE = makeCharacter('}');
     public static final NewtObject CHAR_QUOTE = makeCharacter('\'');
-    public static final NewtObject CHAR_DOUBLE_QUOTE = makeCharacter('\"');
-    public static final NewtObject CHAR_BACK_QUOTE = makeCharacter('`');
+    public static final NewtObject CHAR_DOUBLEQUOTE = makeCharacter('\"');
+    public static final NewtObject CHAR_QUASIQUOTE = makeCharacter('`');
+    public static final NewtObject CHAR_BACKSLASH = makeCharacter('\\');
     public static final NewtObject CHAR_COMMA = makeCharacter(',');
     public static final NewtObject CHAR_AT_SIGN = makeCharacter('@');
 
@@ -40,7 +45,7 @@ public class NewtRuntime {
     public static final NewtObject SYM_BEGIN = makeSymbol("begin");
     public static final NewtObject SYM_DEFMACRO = makeSymbol("defmacro");
     public static final NewtObject SYM_IF = makeSymbol("if");
-    public static final NewtObject S_Cond = makeSymbol("cond");
+    public static final NewtObject SYM_COND = makeSymbol("cond");
     public static final NewtObject SYM_SET_BANG = makeSymbol("set!");
     public static final NewtObject SYM_APPEND = makeSymbol("append");
     public static final NewtObject SYM_LIST = makeSymbol("list");
@@ -429,15 +434,15 @@ public class NewtRuntime {
             else if (c == CHAR_SPACE ||
                     c == CHAR_TAB ||
                     c == CHAR_NEWLINE ||
-                    c == CHAR_CARRIAGE_RETURN) {
+                    c == CHAR_FORMFEED) {
                 // continue
             } else if (c == CHAR_SEMICOLON) {
                 while ((c = readChar(inputPort)) != CHAR_EOF)
-                    if (c == CHAR_CARRIAGE_RETURN || c == CHAR_NEWLINE)
+                    if (c == CHAR_FORMFEED || c == CHAR_NEWLINE)
                         break;
-            } else if (c == CHAR_DOUBLE_QUOTE) {
+            } else if (c == CHAR_DOUBLEQUOTE) {
                 sb = new StringBuffer();
-                while ((c = readChar(inputPort)) != CHAR_DOUBLE_QUOTE)
+                while ((c = readChar(inputPort)) != CHAR_DOUBLEQUOTE)
                     sb.append(c.getCharacter());
                 return makeString(sb.toString());
             } else if (c == CHAR_QUOTE) {
@@ -453,7 +458,7 @@ public class NewtRuntime {
                     obj = readObject(port);
                     return newList(SYM_UNQUOTE, obj);
                 }
-            } else if (c == CHAR_BACK_QUOTE) {
+            } else if (c == CHAR_QUASIQUOTE) {
                 obj = readObject(port);
                 return newList(SYM_QUASIQUOTE, obj);
             } else if (c == CHAR_LEFT_PAREN) {
@@ -466,21 +471,50 @@ public class NewtRuntime {
             } else {
                 sb = new StringBuffer();
                 do {
-
                     sb.append((char) (c.getCharacter()));
                     c = readChar(inputPort);
-                } while (c != CHAR_SPACE && c != CHAR_CARRIAGE_RETURN && c != CHAR_NEWLINE &&
+                } while (c != CHAR_SPACE && c != CHAR_FORMFEED && c != CHAR_NEWLINE &&
                         c != CHAR_TAB && c != CHAR_EOF && c != CHAR_LEFT_PAREN && c != CHAR_RIGHT_PAREN &&
                         c != CHAR_DOT);
                 if (c != CHAR_EOF)
                     unreadChar(port);
-                java.lang.String value = sb.toString();
+                String value = sb.toString();
                 if ("NIL".equalsIgnoreCase(value))
                     return OBJ_NIL;
                 else if ("#T".equalsIgnoreCase(value))
                     return OBJ_TRUE;
                 else if ("#F".equalsIgnoreCase(value))
                     return OBJ_FALSE;
+                else if ("#\\LEFT-PAREN".equalsIgnoreCase(value))
+                    return CHAR_LEFT_PAREN;
+                else if ("#\\RIGHT-PAREN".equalsIgnoreCase(value))
+                    return CHAR_RIGHT_PAREN;
+                else if ("#\\LEFT-BRACKET".equalsIgnoreCase(value))
+                    return CHAR_LEFT_BRACKET;
+                else if ("#\\RIGHT-BRACKET".equalsIgnoreCase(value))
+                    return CHAR_RIGHT_BRACKET;
+                else if ("#\\LEFT-BRACE".equalsIgnoreCase(value))
+                    return CHAR_LEFT_BRACE;
+                else if ("#\\RIGHT-BRACE".equalsIgnoreCase(value))
+                    return CHAR_RIGHT_BRACE;
+                else if ("#\\BACKSLASH".equalsIgnoreCase(value))
+                    return CHAR_BACKSLASH;
+                else if ("#\\QUOTE".equalsIgnoreCase(value))
+                    return CHAR_QUOTE;
+                else if ("#\\QUASIQUOTE".equalsIgnoreCase(value))
+                    return CHAR_QUASIQUOTE;
+                else if ("#\\DOUBLEQUOTE".equalsIgnoreCase(value))
+                    return CHAR_DOUBLEQUOTE;
+                else if ("#\\COMMA".equalsIgnoreCase(value))
+                    return CHAR_COMMA;
+                else if ("#\\NEWLINE".equalsIgnoreCase(value))
+                    return CHAR_NEWLINE;
+                else if ("#\\TAB".equalsIgnoreCase(value))
+                    return CHAR_TAB;
+                else if ("#\\SPACE".equalsIgnoreCase(value))
+                    return CHAR_SPACE;
+                else if ("#\\FORM".equalsIgnoreCase(value))
+                    return CHAR_FORMFEED;
                 else if (value.startsWith("#\\")) {
                     char c1 = value.charAt(2);
                     return NewtCharacter.intern(c1);
@@ -586,6 +620,14 @@ public class NewtRuntime {
         return obj1.asNumber().getValue() != obj2.asNumber().getValue() ? OBJ_TRUE : OBJ_FALSE;
     }
 
+    public static NewtObject charEq(NewtObject obj1, NewtObject obj2) {
+        return obj1.asCharacter().getCharacter() == obj2.asCharacter().getCharacter() ? OBJ_TRUE : OBJ_FALSE;
+    }
+
+    public static NewtObject charLt(NewtObject obj1, NewtObject obj2) {
+        return obj1.asCharacter().getCharacter() < obj2.asCharacter().getCharacter() ? OBJ_TRUE : OBJ_FALSE;
+    }
+
     public static NewtObject nullP(NewtObject obj) {
         return obj == OBJ_NIL ? OBJ_TRUE : OBJ_FALSE;
     }
@@ -599,9 +641,56 @@ public class NewtRuntime {
     }
 
     public static NewtObject properListP(NewtObject obj) {
-        for ( ; obj.isPair(); obj = cdr(obj))
+        for (; obj.isPair(); obj = cdr(obj))
             ;
         NewtObject ans = obj == OBJ_NIL ? OBJ_TRUE : OBJ_FALSE;
+        return ans;
+    }
+
+    public static NewtObject stringEqualP(NewtObject obj1, NewtObject obj2) {
+        String val1 = obj1.asString().getValue();
+        String val2 = obj2.asString().getValue();
+        NewtObject ans = val1.equals(val2) ? OBJ_TRUE : OBJ_FALSE;
+        return ans;
+    }
+
+    public static NewtObject stringAppend(NewtObject... strings) {
+        String tmp = "";
+        for (int i = 0; i < strings.length; ++i) {
+            String val = strings[i].asString().getValue();
+            tmp += val;
+        }
+        NewtObject ans = makeString(tmp);
+        return ans;
+    }
+
+    public static NewtObject copyString(NewtObject string) {
+        NewtObject ans = makeString(string.asString().getValue());
+        return ans;
+    }
+
+    public static NewtObject charToString(NewtObject chr) {
+        String tmp = "" + chr.asCharacter().getCharacter();
+        NewtObject ans = makeString(tmp);
+        return ans;
+    }
+
+    public static NewtObject stringToList(NewtObject string) {
+        NewtObject ans = OBJ_NIL;
+        String val = string.asString().getValue();
+        for (int i = val.length() - 1; i >= 0; --i)
+        {
+            char c = val.charAt(i);
+            ans = makePair(makeCharacter(c), ans);
+        }
+        return ans;
+    }
+
+    public static NewtObject listToString(NewtObject list) {
+        String value = "";
+        for (; list.isPair(); list = cdr(list))
+            value += car(list).asCharacter().getCharacter();
+        NewtObject ans = makeString(value);
         return ans;
     }
 
@@ -615,7 +704,7 @@ public class NewtRuntime {
         return obj == OBJ_NIL ? OBJ_TRUE : OBJ_FALSE;
     }
 
-    public static NewtObject or(NewtObject...obj) {
+    public static NewtObject or(NewtObject... obj) {
         for (int i = 0; i < obj.length; ++i)
             if (obj[i] != OBJ_FALSE)
                 return OBJ_TRUE;

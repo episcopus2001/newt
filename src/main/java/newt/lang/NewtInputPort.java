@@ -33,7 +33,7 @@ public class NewtInputPort extends NewtPort {
     }
 
     public final String toString() {
-        return "#<input port>";
+        return "#<INPUT PORT>";
     }
 
     @Override

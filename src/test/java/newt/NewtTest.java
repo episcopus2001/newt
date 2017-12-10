@@ -9,8 +9,8 @@ public class NewtTest extends NewtTestSupport {
     @DisplayName("Test for debugging")
     public void testForDebugging() {
         lisp()
-                .eval("(length '(a))")
-                .yields(1);
+                .eval("(char? #\\X)")
+                .yieldsTrue();
 
 //        lisp()
 //                .eval("(length nil)")
