@@ -1,0 +1,126 @@
+
+; c*r
+
+(define (caar x) (car (car x)))
+(define (cadr x) (car (cdr x)))
+(define (cdar x) (cdr (car x)))
+(define (cddr x) (cdr (cdr x)))
+
+(define (caaar x) (car (caar x)))
+(define (caadr x) (car (cadr x)))
+(define (cadar x) (car (cdar x)))
+(define (caddr x) (car (cddr x)))
+(define (cdaar x) (cdr (caar x)))
+(define (cdadr x) (cdr (cadr x)))
+(define (cddar x) (cdr (cdar x)))
+(define (cdddr x) (cdr (cddr x)))
+
+(define (caaaar x) (car (caaar x)))
+(define (caaadr x) (car (caadr x)))
+(define (caadar x) (car (cadar x)))
+(define (caaddr x) (car (caddr x)))
+(define (cadaar x) (car (cdaar x)))
+(define (cadadr x) (car (cdadr x)))
+(define (caddar x) (car (cddar x)))
+(define (cadddr x) (car (cdddr x)))
+
+(define (cdaaar x) (cdr (caaar x)))
+(define (cdaadr x) (cdr (caadr x)))
+(define (cdadar x) (cdr (cadar x)))
+(define (cdaddr x) (cdr (caddr x)))
+(define (cddaar x) (cdr (cdaar x)))
+(define (cddadr x) (cdr (cdadr x)))
+(define (cdddar x) (cdr (cddar x)))
+(define (cddddr x) (cdr (cdddr x)))
+
+; Boolean operations
+
+(define (not x)
+    (if x #f #t))
+
+(define (and x y)
+    (if x y x))
+
+(define (or x y)
+    (if x x y))
+
+; Comparisons (given <, =)
+
+(define (> x y)
+    (< y x))
+
+(define (!= x y)
+    (not (= x y)))
+
+(define (>= x y)
+    (not (< x y)))
+
+(define (<= x y)
+    (not (> x y)))
+
+; List access
+
+(define (nthcdr list index)
+    (if (= index 0)
+        list
+        (nthcdr (cdr list) (- index 1))))
+
+(define (nth list index)
+    (car (nthcdr list index)))
+
+(define (lastcdr list)
+    (if (pair? (cdr list))
+        (lastcdr (cdr list))
+        list))
+
+(define (last list)
+    (car (lastcdr list)))
+
+; Lists as sequences
+
+(define (length list)
+    (if (pair? list)
+        (+ 1 (length (cdr list)))
+        0))
+
+(define (reverse1 list ans)
+    (if (null? list)
+        ans
+        (reverse1 (cdr list) (cons (car list) ans))))
+
+(define (reverse list)
+    (reverse1 list nil))
+
+(define (sublist1 list count ans)
+    (if (= 0 count)
+        (reverse ans)
+        (sublist1 (cdr list) (- count 1) (cons (car list) ans))))
+
+(define (sublist list start count)
+    (if (= 0 start)
+        (sublist1 list count nil)
+        (sublist (cdr list) (- start 1) count)))
+
+; Lists as stacks
+
+(defmacro (push location object)
+    `(set! ,location (cons ,object ,location)))
+
+(defmacro (pop location)
+    `(let ((temp 0))
+        (set! temp (car ,location))
+        (set! ,location (cdr ,location))
+        temp))
+
+
+; various
+
+(define (null? obj)
+    (if obj #f #t))
+
+(define (atom? obj)
+    (not (pair? obj)))
+
+
+
+

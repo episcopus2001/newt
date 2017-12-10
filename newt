@@ -1,0 +1,2 @@
+#!/bin/bash
+java -cp target/newt-1.0-SNAPSHOT.jar newt.lang.NewtMain $@
